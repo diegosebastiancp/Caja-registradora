@@ -1,0 +1,387 @@
+{% extends "index.html" %}
+
+{% block contenido %}
+
+<div class="row m-0 h-100">
+
+    <!-- Columna del lado izquierdo, carrito -->
+    <div id="col-carro" class="col h-100 d-flex">
+        <div class="container-fluid border bg-white my-4 px-5 py-4 flex-grow-1 d-flex flex-column">
+            <div class="row align-items-end px-4">
+                <div class="col d-flex text-start align-items-end">
+                    <div>
+                        <label for="id_code">Código de barra</label>
+                        <input id="id_code" class="form-control" name="code" type="text" inputmode="numeric" autofocus required>
+                    </div>
+                    <div class="ms-4 mb-2">
+                        <span id="mensaje"></span>
+                        <span id="error_msje"></span>
+                    </div>
+                </div>
+                <div class="col text-end">
+                    <a type="button" href="{{ url_for('lista') }}" class="btn btn-outline-secondary"><i class="bi bi-list-task me-2"></i>Lista productos</a>
+                    <button type="button" class="btn btn-success" onclick="modal_add.show()"><i class="bi bi-plus-circle me-2"></i>Agregar
+                        producto</button>
+                </div>
+            </div>
+
+            <div class="container-fluid alert alert-warning mt-3">
+                <i><i class="bi bi-upc-scan me-3"></i>Escanea el código de barra de un producto con la pistola</i>
+            </div>
+            <!-- Tabla de productos agregados al carro -->
+            <div class="container-fluid mt-3 flex-grow-1 overflow-auto">
+                <table class="table table-striped">
+                    <thead>
+                        <tr class="fw-normal">
+                            <th scope="col" class="bg-success text-white">Código</th>
+                            <th scope="col" class="bg-success text-white">Cantidad</th>
+                            <th scope="col" class="bg-success text-white">Producto</th>
+                            <th scope="col" class="bg-success text-white">Precio</th>
+                            <th scope="col" class="col-1 bg-success text-white"></th>
+                        </tr>
+                    </thead>
+                    <tbody id="cuerpo-tabla" class="fs-5">
+                    </tbody>
+                </table>
+            </div>
+            <div class="container row mt-4">
+                <div class="col">
+                    <p><span id="cant">0</span> producto(s) en el carro.</p>
+                </div>
+                <!--<div class="col">
+                    <table class="table d-inline-flex flex-row-reverse">
+                        <tr>
+                            <td class="fw-bold">Valor total:</td>
+                            <td>$ <span id="valor-total2"></span></td>
+                        </tr>
+                    </table>
+                </div>-->
+            </div>
+            <!--<div class="container text-end my-4">
+                <button type="button" name="btn_limpiar" value="fin" class="btn btn-light me-3" onclick="borrar_carro()"><i class="bi bi-cart-x me-2"></i>Borrar carrito</button>
+                <button type="button" name="btn_fin" value="fin" class="btn btn-primary" onclick="modal_fin.show()"><i class="bi bi-cart-check me-2"></i>Finalizar compra</button>
+            </div>-->
+
+        </div>
+    </div>
+
+    <!-- Columna del lado derecho, precio total -->
+    <div id="col-fin" class="col-4">
+        <div class="container-fluid border bg-white my-4 px-5 py-4">
+            <span class="fw-bold" style="font-size: 1.1rem;">Valor total:</span>
+            <div class="card bg-dark mt-2">
+                <div class="card-body text-center text-light fw-bold">
+                    <span style="font-size: 3rem;">$<span id="valor-total" class="ms-2">0</span></span>
+                </div>
+            </div>
+            <div class="mt-3">
+                <span class="fw-bold" style="font-size: 1.1rem;">Datos del cliente:</span>
+                <div class="input-group input-group-lg mt-2 mb-3">
+                    <span class="input-group-text" id="inputGroup-sizing-default">RUT Puntos</span>
+                    <input type="text" class="form-control" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-default">
+                </div>                
+                <div class="input-group input-group-lg mb-3">
+                    <span class="input-group-text" id="inputGroup-sizing-default">Descuento</span>
+                    <input type="number" class="form-control" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-default">
+                </div>
+            </div>
+            <div class="container-fluid p-0 my-3">
+                <span class="fw-bold" style="font-size: 1.1rem;">Seleccione el medio de pago:</span>
+
+                <div style="height: 9rem;">
+                    <div class="d-flex w-100 h-100 gap-2 mt-2">
+                        <input type="radio" class="btn-check" name="pago" id="efectivo">
+                        <label class="btn btn-outline-secondary flex-fill d-flex align-items-center justify-content-center" for="efectivo">
+                            <div class="container">
+                                <i class="bi bi-cash-coin fs-1"></i>
+                                <p>Efectivo</p>
+                            </div>
+                        </label>
+                    
+                        <input type="radio" class="btn-check" name="pago" id="tarjeta">
+                        <label class="btn btn-outline-secondary flex-fill d-flex align-items-center justify-content-center text-center" for="tarjeta">
+                            <div class="container">
+                                <i class="bi bi-credit-card fs-1"></i>
+                                <p>Tarjeta</p>
+                            </div>
+                        </label>
+                    
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="d-grid gap-3 px-5 mt-4">
+            <style>
+                .btn-finales {
+                    --bs-btn-padding-y: 1.5rem;
+                }
+            </style>
+            <button id="btn-finalizar" class="btn btn-success btn-lg btn-finales" type="button" onclick="finalizar_compra()" disabled><i class="bi bi-cart-check me-2"></i>Finalizar pago</button>
+            <button class="btn btn-outline-secondary btn-lg btn-finales" type="button" onclick="borrar_carro()"><i class="bi bi-trash3 me-2"></i>Borrar carrito</button>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para agregar nuevo producto -->
+<div id="modal_add" class="modal fade" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Agregar nuevo producto</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+
+        <form id="form_new" method="post">
+
+            <div class="modal-body d-flex">
+                <div class="container">
+                    <div class="container text-center">
+                        <i class="bi bi-upc-scan" style="font-size: 42px;"></i>
+                    </div>
+                    <label for="id_codigo">Código</label>
+                    <input name="codigo" id="id_codigo" class="form-control" required/>
+                    <label for="id_desc">Descripción del producto</label>
+                    <input name="desc" id="id_desc" class="form-control" required/>
+                    <label for="id_precio">Precio</label>
+                    <input name="precio" type="number" id="id_precio" class="form-control" required/>
+                </div>
+            </div>
+            <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+            <button type="button" class="btn btn-primary" onclick="nuevo_producto();">Agregar</button>
+            </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+<!-- Modal de pago exitoso -->
+<div id="modal_success" class="modal fade" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title"><i class="bi bi-bag-check me-2"></i>Pago exitoso</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body d-flex">
+                <div id="anim"></div>
+                <script src="https://cdnjs.cloudflare.com/ajax/libs/lottie-web/5.12.2/lottie.min.js"></script>
+                <script>
+                    const anim = lottie.loadAnimation({
+                    container: document.getElementById('anim'),
+                    renderer: 'svg',
+                    loop: false,
+                    autoplay: false,
+                    path: "{{ url_for('static', filename='animations/payment-success.json') }}"
+                    });
+
+                    const modalSuccess = document.getElementById('modal_success');
+
+                    modalSuccess.addEventListener('shown.bs.modal', function () {
+                        setTimeout(() => {
+                            anim.goToAndPlay(0, true);
+                        }, 300);
+                    });
+                </script>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+
+<script>
+        const ipt_code = document.getElementById('id_code');
+        const cuerpo_tabla = document.getElementById('cuerpo-tabla');
+        const valor_total = document.getElementById('valor-total');
+        const cant = document.getElementById('cant');
+
+        // Formulario de añadir nuevo producto
+        const nuevo_codigo = document.getElementById('id_codigo');
+        const nuevo_desc = document.getElementById('id_desc');
+        const nuevo_precio = document.getElementById('id_precio');
+
+        let carro = [];
+        let total = 0;
+        let cantidad = 0;
+
+        const modal_add = new bootstrap.Modal(document.getElementById('modal_add'), {
+            keyboard: false
+        });
+        const modal_success = new bootstrap.Modal(document.getElementById('modal_success'), {
+            keyboard: false
+        });
+
+        document.getElementById("modal_add").addEventListener('shown.bs.modal', () => {
+            nuevo_codigo.focus();
+        });
+
+        document.getElementById("modal_add").addEventListener('hidden.bs.modal', () => {
+            ipt_code.focus();
+        });
+
+        // siempre mantener foco
+        //document.addEventListener("click", () => ipt_code.focus());
+        //window.addEventListener("load", () => ipt_code.focus());
+
+        ipt_code.addEventListener('input', function (e) {
+            this.value = this.value.replace(/\D/g, '');
+        });
+
+        ipt_code.addEventListener("keydown", (e) => {
+            if (e.key !== "Enter" || ipt_code.value == "") return;
+
+            e.preventDefault();
+
+            const url = "/add";
+            const code = { 'codigo': ipt_code.value };
+
+            fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(code),
+            })
+                .then(response => response.json())
+                .then(data => {
+                    //console.log(data);
+                    var span_msje = document.getElementById("mensaje");
+                    var error_msje = document.getElementById("error_msje");
+                    if (data.check == true) {
+                        span_msje.innerText = data.msg;
+                        span_msje.style.color = "green";
+                        let check = false;
+                        for (const item of carro) {
+                            if (data.codigo == item.codigo) {
+                                item.cantidad += 1;
+                                item.valor += data.valor;
+                                check = true;
+                                break;
+                            }
+                            else {
+                                check = false;
+                            }
+                        }
+                        if (check == false) {
+                            carro.push(data);
+                        }
+                        
+                        //total += data.valor;
+                        cantidad += 1;
+                        cargaCarro();
+                    }
+                    else {
+                        span_msje.innerText = data.msg;
+                        span_msje.style.color = "brown";
+                        //ipt.value = "";
+                    }
+                    //if (data.error != '') {
+                    //    error_msje.innerText = data.error;
+                    //}
+                })
+            ipt_code.value = '';
+
+        })
+
+        function fila(codigo, producto, valor, cantidad) {
+            return `<tr>
+                    <td>${codigo}</td>
+                    <td>${cantidad}</td>
+                    <td>${producto}</td>
+                    <td>$ ${valor}</td>
+                    <td><button class="btn btn-light" onclick="quitar(${codigo}, ${valor});"><i class="bi bi-trash3"></i></button></td>
+                </tr>`;
+        }
+
+        function cargaCarro() {
+
+            total = 0;
+            cuerpo_tabla.innerHTML = "";
+            for (const producto of carro) {
+                cuerpo_tabla.innerHTML += fila(producto.codigo, producto.producto, producto.valor, producto.cantidad);
+                total += producto.valor;
+            };
+            valor_total.innerHTML = total.toLocaleString('es-CL');
+            //cant.innerHTML = carro.length;
+            cant.innerHTML = cantidad;
+            verificarCompra();
+            console.log(carro);
+        }
+
+        function quitar(codigo, valor) {
+
+            let producto = carro.find(pdt => pdt.codigo == codigo);
+            carro = carro.filter(producto => producto.codigo !== codigo);
+            total -= valor;
+            cantidad -= producto.cantidad;
+            cargaCarro();
+        }
+        
+        function nuevo_producto() {
+
+            const url = "/addnew";
+            const form = document.getElementById("form_new");
+            if (!form.checkValidity()) {
+                form.reportValidity(); // muestra mensajes del navegador
+                return; // NO hace fetch
+            }
+            const datos = new FormData(form);
+
+            fetch(url, {
+                method: 'POST',
+                body: datos,
+            })
+                .then(response => response.json())
+                .then(data => {
+                    //console.log(data);
+                    var span_msje = document.getElementById("mensaje");
+                    var error_msje = document.getElementById("error_msje");
+                    if (data.check == true) {
+                        span_msje.innerText = data.msg;
+                        span_msje.style.color = "green";
+                    }
+                    else {
+                        span_msje.innerText = data.msg;
+                        span_msje.style.color = "brown";
+                    }
+                    modal_add.hide();
+                })
+            ipt_code.value = '';
+            nuevo_codigo.value = '';
+            nuevo_desc.value = '';
+            nuevo_precio.value = '';
+
+        }
+        
+        function borrar_carro() {
+            carro = [];
+            cantidad = 0;
+
+            document.getElementById('efectivo').checked = false;
+            document.getElementById('tarjeta').checked = false;
+
+            cargaCarro();
+        }
+
+        document.querySelectorAll('input[name="pago"]').forEach(radio => {
+            radio.addEventListener('change', verificarCompra);
+        });
+
+        function verificarCompra() {
+            const medioPago = document.querySelector('input[name="pago"]:checked');
+            const boton = document.getElementById('btn-finalizar');
+
+            boton.disabled = !(total > 0 && medioPago);
+        }
+
+        function finalizar_compra() {
+            modal_success.show();
+        }
+
+
+</script>
+{% endblock %}

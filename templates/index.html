@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jumbo</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.min.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap-icons.css') }}">
+</head>
+
+<body class="bg-light d-flex flex-column vh-100" style="font-size: 1.2rem;">
+
+    <div class="border bg-white px-4">
+        <div class="row align-items-center">
+            <div class="col">
+                <h2><img src="static/logo-jumbo.webp" width="250px" alt="Sistema de caja Jumbo">Caja registradora</h2>
+            </div>
+            <div class="col text-end pe-5">
+                <i style="opacity: 0.7;"><i class="bi bi-file-person me-1"></i> CAJERA: SOFÍA ANTONIA CASTILLO RUBIO</i><br>
+                <i style="opacity: 0.7;"><i class="bi bi-calendar-check me-1"></i> FECHA: <span id="fecha-hoy"></span></i>
+            </div>
+        </div>
+    </div>
+
+    <main class="flex-grow-1">
+        {% block contenido %}
+        
+        {% endblock %}
+    </main>
+
+
+    <script src="{{ url_for('static', filename='js/bootstrap.bundle.min.js') }}"></script>
+    {% block scripts %}
+
+    {% endblock %}
+    <script>
+        function fechaHoy() {
+            const hoy = new Date();
+
+            const dd = String(hoy.getDate()).padStart(2, '0');
+            const mm = String(hoy.getMonth() + 1).padStart(2, '0'); // enero = 0
+            const yyyy = hoy.getFullYear();
+
+            return `${dd}-${mm}-${yyyy}`;
+        }
+
+        document.getElementById('fecha-hoy').innerHTML = fechaHoy();
+    </script>
+</body>
+
+</html>

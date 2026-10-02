@@ -1,0 +1,140 @@
+{% extends "index.html" %}
+
+{% block contenido %}
+<div class="container-fluid border bg-white my-4 px-5 py-4">
+    <div class="row align-items-center">
+        <div class="col">
+            <h3>Lista de productos</h3>
+        </div>
+        <div class="col text-end">
+            <a class="btn btn-light" href="{{ url_for('home') }}"><i class="bi bi-arrow-left me-2"></i>Volver a la caja</a>
+        </div>
+    </div>
+    <div class="container-fluid mt-3">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle">
+                <thead class="table-light">
+                    <tr>
+                        <th>Código</th>
+                        <th>Producto</th>
+                        <th class="text-end">Precio</th>
+                        <th class="text-center" style="width: 120px;">Acciones</th>
+                    </tr>
+                </thead>
+        
+                <tbody>
+                    {% for p in productos %}
+                    <tr>
+                        <td class="text-muted">{{ p.codigo }}</td>
+        
+                        <td class="fw-semibold">
+                            {{ p.producto }}
+                        </td>
+        
+                        <td class="text-end">
+                            ${{ p.precio }}
+                        </td>
+        
+                        <td class="text-center">
+                            <button class="btn btn-sm btn-outline-primary"
+                                    onclick="editarProducto('{{ p.codigo }}', '{{ p.producto }}', '{{ p.precio }}')">
+                                <i class="bi bi-pencil"></i>
+                            </button>
+        
+                            <a href="{{ url_for('eliminar_producto', codigo=p.codigo) }}"
+                            class="btn btn-sm btn-outline-danger"
+                            onclick="return confirm('¿Eliminar {{ p.producto }}?')">
+                                <i class="bi bi-trash"></i>
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div id="modal_edit" class="modal fade" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+    
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        <i class="bi bi-pencil me-2"></i>Editar producto
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+    
+                <div class="modal-body">
+                    <input type="hidden" id="edit_codigo">
+    
+                    <label class="form-label">Producto</label>
+                    <input type="text" id="edit_producto" class="form-control mb-3">
+    
+                    <label class="form-label">Precio</label>
+                    <input type="number" id="edit_precio" class="form-control">
+                </div>
+    
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" data-bs-dismiss="modal">
+                        Cerrar
+                    </button>
+    
+                    <button class="btn btn-primary" onclick="guardarEdicion()">
+                        Guardar
+                    </button>
+                </div>
+    
+            </div>
+        </div>
+    </div>
+
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    const modal_edit = new bootstrap.Modal(
+        document.getElementById('modal_edit')
+    );
+
+    function editarProducto(codigo, producto, precio) {
+
+        document.getElementById("edit_codigo").value = codigo;
+        document.getElementById("edit_producto").value = producto;
+        document.getElementById("edit_precio").value = precio;
+
+        modal_edit.show();
+    }
+
+    function guardarEdicion() {
+
+const codigo = document.getElementById("edit_codigo").value;
+const producto = document.getElementById("edit_producto").value;
+const precio = document.getElementById("edit_precio").value;
+
+    fetch(`/producto/editar/${codigo}`, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+            producto: producto,
+            precio: precio
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+
+        if (data.check) {
+            modal_edit.hide();
+            location.reload();
+        }
+        else {
+            alert(data.msg);
+        }
+
+    });
+    }
+</script>
+{% endblock %}
