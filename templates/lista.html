@@ -109,32 +109,33 @@
 
     function guardarEdicion() {
 
-const codigo = document.getElementById("edit_codigo").value;
-const producto = document.getElementById("edit_producto").value;
-const precio = document.getElementById("edit_precio").value;
+        const codigo = document.getElementById("edit_codigo").value;
+        const producto = document.getElementById("edit_producto").value;
+        const precio = document.getElementById("edit_precio").value;
 
-    fetch(`/producto/editar/${codigo}`, {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-            producto: producto,
-            precio: precio
+        fetch(`/producto/editar/${codigo}`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                producto: producto,
+                precio: precio
+            })
         })
-    })
-    .then(response => response.json())
-    .then(data => {
+        .then(response => response.json())
+        .then(data => {
 
-        if (data.check) {
-            modal_edit.hide();
-            location.reload();
-        }
-        else {
-            alert(data.msg);
-        }
+            if (data.check) {
+                modal_edit.hide();
+                location.reload();
+            }
+            else {
+                alert(data.msg);
+            }
 
-    });
+        });
     }
+
 </script>
 {% endblock %}

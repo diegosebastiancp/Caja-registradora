@@ -48,20 +48,7 @@
                 <div class="col">
                     <p><span id="cant">0</span> producto(s) en el carro.</p>
                 </div>
-                <!--<div class="col">
-                    <table class="table d-inline-flex flex-row-reverse">
-                        <tr>
-                            <td class="fw-bold">Valor total:</td>
-                            <td>$ <span id="valor-total2"></span></td>
-                        </tr>
-                    </table>
-                </div>-->
             </div>
-            <!--<div class="container text-end my-4">
-                <button type="button" name="btn_limpiar" value="fin" class="btn btn-light me-3" onclick="borrar_carro()"><i class="bi bi-cart-x me-2"></i>Borrar carrito</button>
-                <button type="button" name="btn_fin" value="fin" class="btn btn-primary" onclick="modal_fin.show()"><i class="bi bi-cart-check me-2"></i>Finalizar compra</button>
-            </div>-->
-
         </div>
     </div>
 
@@ -248,7 +235,6 @@
             })
                 .then(response => response.json())
                 .then(data => {
-                    //console.log(data);
                     var span_msje = document.getElementById("mensaje");
                     var error_msje = document.getElementById("error_msje");
                     if (data.check == true) {
@@ -270,18 +256,13 @@
                             carro.push(data);
                         }
                         
-                        //total += data.valor;
                         cantidad += 1;
                         cargaCarro();
                     }
                     else {
                         span_msje.innerText = data.msg;
                         span_msje.style.color = "brown";
-                        //ipt.value = "";
                     }
-                    //if (data.error != '') {
-                    //    error_msje.innerText = data.error;
-                    //}
                 })
             ipt_code.value = '';
 
@@ -306,7 +287,6 @@
                 total += producto.valor;
             };
             valor_total.innerHTML = total.toLocaleString('es-CL');
-            //cant.innerHTML = carro.length;
             cant.innerHTML = cantidad;
             verificarCompra();
             console.log(carro);
@@ -337,7 +317,6 @@
             })
                 .then(response => response.json())
                 .then(data => {
-                    //console.log(data);
                     var span_msje = document.getElementById("mensaje");
                     var error_msje = document.getElementById("error_msje");
                     if (data.check == true) {

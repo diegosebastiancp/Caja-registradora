@@ -16,8 +16,14 @@ def home():
 
 @app.route("/lista")
 def lista():
-    
-    lista = session.query(Productos).all()
+
+    lista = session.query(Productos).order_by(
+        Productos.producto.collate("NOCASE").asc()
+    ).all()
+
+    for p in lista:
+        print(p.producto)
+
     return render_template("lista.html", productos=lista)
 
 @app.route("/add", methods=['POST'])
